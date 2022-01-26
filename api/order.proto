@@ -30,4 +30,16 @@ service Receiver {
 }
 
 
+message BuyEvent {
+    int64 order_id = 1;
+    int64 user_id = 2;
+    google.protobuf.Timestamp created_at = 3;
+}
 
+service BuyEventSender {
+    rpc SendEvent(BuyEvent) returns (google.protobuf.Empty);
+}
+
+service BuyEventReceiver {
+    rpc ReceiveEvent(BuyEvent) returns (google.protobuf.Empty);
+}

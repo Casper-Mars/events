@@ -24,3 +24,12 @@ func (o *EventSub2) ReceiveEvent(ctx context.Context, event *api.Event) (*emptyp
 	log.Printf("Sub2 Received event: %v", event)
 	return &emptypb.Empty{}, nil
 }
+
+type BuyEventSub struct {
+	api.UnimplementedBuyEventReceiverServer
+}
+
+func (b *BuyEventSub) ReceiveEvent(ctx context.Context, event *api.BuyEvent) (*emptypb.Empty, error) {
+	log.Printf("Buy Event Received event: %v", event)
+	return &emptypb.Empty{}, nil
+}

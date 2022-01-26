@@ -6,7 +6,7 @@ import (
 )
 
 type Handler interface {
-	Handle(ctx context.Context, msg Message)
+	Handle(ctx context.Context, msg Message) error
 }
 
 type Message struct {
@@ -21,4 +21,15 @@ type SubRequest struct {
 type Subscriber interface {
 	transport.Server
 	Subscribe(subReq SubRequest, handler Handler) error
+}
+
+type ReceiverBuilder interface {
+	Build(subReq SubRequest) (Receiver, error)
+}
+
+type Receiver interface {
+	Receive(ctx context.Context) (Message, error)
+	Ack(msg Message) error
+	Nack(msg Message) error
+	Close() error
 }

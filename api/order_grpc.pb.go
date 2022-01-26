@@ -186,3 +186,175 @@ var Receiver_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/order.proto",
 }
+
+// BuyEventSenderClient is the client API for BuyEventSender service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type BuyEventSenderClient interface {
+	SendEvent(ctx context.Context, in *BuyEvent, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type buyEventSenderClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewBuyEventSenderClient(cc grpc.ClientConnInterface) BuyEventSenderClient {
+	return &buyEventSenderClient{cc}
+}
+
+func (c *buyEventSenderClient) SendEvent(ctx context.Context, in *BuyEvent, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/api.BuyEventSender/SendEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BuyEventSenderServer is the server API for BuyEventSender service.
+// All implementations must embed UnimplementedBuyEventSenderServer
+// for forward compatibility
+type BuyEventSenderServer interface {
+	SendEvent(context.Context, *BuyEvent) (*emptypb.Empty, error)
+	mustEmbedUnimplementedBuyEventSenderServer()
+}
+
+// UnimplementedBuyEventSenderServer must be embedded to have forward compatible implementations.
+type UnimplementedBuyEventSenderServer struct {
+}
+
+func (UnimplementedBuyEventSenderServer) SendEvent(context.Context, *BuyEvent) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEvent not implemented")
+}
+func (UnimplementedBuyEventSenderServer) mustEmbedUnimplementedBuyEventSenderServer() {}
+
+// UnsafeBuyEventSenderServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BuyEventSenderServer will
+// result in compilation errors.
+type UnsafeBuyEventSenderServer interface {
+	mustEmbedUnimplementedBuyEventSenderServer()
+}
+
+func RegisterBuyEventSenderServer(s grpc.ServiceRegistrar, srv BuyEventSenderServer) {
+	s.RegisterService(&BuyEventSender_ServiceDesc, srv)
+}
+
+func _BuyEventSender_SendEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuyEvent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuyEventSenderServer).SendEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.BuyEventSender/SendEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuyEventSenderServer).SendEvent(ctx, req.(*BuyEvent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// BuyEventSender_ServiceDesc is the grpc.ServiceDesc for BuyEventSender service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var BuyEventSender_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.BuyEventSender",
+	HandlerType: (*BuyEventSenderServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SendEvent",
+			Handler:    _BuyEventSender_SendEvent_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/order.proto",
+}
+
+// BuyEventReceiverClient is the client API for BuyEventReceiver service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type BuyEventReceiverClient interface {
+	ReceiveEvent(ctx context.Context, in *BuyEvent, opts ...grpc.CallOption) (*emptypb.Empty, error)
+}
+
+type buyEventReceiverClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewBuyEventReceiverClient(cc grpc.ClientConnInterface) BuyEventReceiverClient {
+	return &buyEventReceiverClient{cc}
+}
+
+func (c *buyEventReceiverClient) ReceiveEvent(ctx context.Context, in *BuyEvent, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/api.BuyEventReceiver/ReceiveEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BuyEventReceiverServer is the server API for BuyEventReceiver service.
+// All implementations must embed UnimplementedBuyEventReceiverServer
+// for forward compatibility
+type BuyEventReceiverServer interface {
+	ReceiveEvent(context.Context, *BuyEvent) (*emptypb.Empty, error)
+	mustEmbedUnimplementedBuyEventReceiverServer()
+}
+
+// UnimplementedBuyEventReceiverServer must be embedded to have forward compatible implementations.
+type UnimplementedBuyEventReceiverServer struct {
+}
+
+func (UnimplementedBuyEventReceiverServer) ReceiveEvent(context.Context, *BuyEvent) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReceiveEvent not implemented")
+}
+func (UnimplementedBuyEventReceiverServer) mustEmbedUnimplementedBuyEventReceiverServer() {}
+
+// UnsafeBuyEventReceiverServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BuyEventReceiverServer will
+// result in compilation errors.
+type UnsafeBuyEventReceiverServer interface {
+	mustEmbedUnimplementedBuyEventReceiverServer()
+}
+
+func RegisterBuyEventReceiverServer(s grpc.ServiceRegistrar, srv BuyEventReceiverServer) {
+	s.RegisterService(&BuyEventReceiver_ServiceDesc, srv)
+}
+
+func _BuyEventReceiver_ReceiveEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuyEvent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuyEventReceiverServer).ReceiveEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.BuyEventReceiver/ReceiveEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuyEventReceiverServer).ReceiveEvent(ctx, req.(*BuyEvent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// BuyEventReceiver_ServiceDesc is the grpc.ServiceDesc for BuyEventReceiver service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var BuyEventReceiver_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.BuyEventReceiver",
+	HandlerType: (*BuyEventReceiverServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ReceiveEvent",
+			Handler:    _BuyEventReceiver_ReceiveEvent_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/order.proto",
+}

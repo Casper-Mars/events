@@ -6,17 +6,20 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-func NewSubscriber(orderSub1 api.ReceiverServer, orderSub2 api.ReceiverServer) events.Subscriber {
+func NewSubscriber(orderSub1 api.ReceiverServer, orderSub2 api.ReceiverServer, buySub api.BuyEventReceiverServer) events.Subscriber {
 	cli, err := sarama.NewClient([]string{"localhost:9093"}, sarama.NewConfig())
 	if err != nil {
 		panic(err)
 	}
-	kafkaServer := events.NewKafkaSubscriber(cli)
-	api.RegisterHandler(kafkaServer, events.SubRequest{
+	server := events.NewServer(events.WithReceiverBuilder(events.NewKafkaReceiverBuilder(cli)))
+	api.RegisterOrderHandler(server, events.SubRequest{
 		Topic: "order",
 	}, orderSub1)
-	api.RegisterHandler(kafkaServer, events.SubRequest{
+	api.RegisterOrderHandler(server, events.SubRequest{
 		Topic: "order",
 	}, orderSub2)
-	return kafkaServer
+	api.RegisterBuyEventHandler(server, events.SubRequest{
+		Topic: "buy",
+	}, buySub)
+	return server
 }

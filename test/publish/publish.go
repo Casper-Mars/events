@@ -32,7 +32,7 @@ func main() {
 			log.Printf("marshal error: %v", err)
 			continue
 		}
-		producer.Input() <- &sarama.ProducerMessage{Topic: "order", Value: sarama.ByteEncoder(marshal)}
+		producer.Input() <- &sarama.ProducerMessage{Topic: "buy", Value: sarama.ByteEncoder(marshal)}
 
 		log.Printf("send msg")
 		time.Sleep(time.Second)
