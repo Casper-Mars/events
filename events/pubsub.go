@@ -6,7 +6,7 @@ import (
 )
 
 type Handler interface {
-	Handle(ctx context.Context, data []byte)
+	Handle(ctx context.Context, msg Message)
 }
 
 type Message struct {

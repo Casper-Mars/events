@@ -7,11 +7,20 @@ import (
 	"log"
 )
 
-type OrderEvent struct {
+type EventSub1 struct {
 	api.UnimplementedReceiverServer
 }
 
-func (o *OrderEvent) ReceiveEvent(ctx context.Context, event *api.Event) (*emptypb.Empty, error) {
-	log.Printf("Received event: %v", event)
+func (o *EventSub1) ReceiveEvent(ctx context.Context, event *api.Event) (*emptypb.Empty, error) {
+	log.Printf("Sub1 Received event: %v", event)
+	return &emptypb.Empty{}, nil
+}
+
+type EventSub2 struct {
+	api.UnimplementedReceiverServer
+}
+
+func (o *EventSub2) ReceiveEvent(ctx context.Context, event *api.Event) (*emptypb.Empty, error) {
+	log.Printf("Sub2 Received event: %v", event)
 	return &emptypb.Empty{}, nil
 }

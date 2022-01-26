@@ -6,51 +6,51 @@ import (
 	"log"
 )
 
-type KafkaServer struct {
-	consumer   sarama.Consumer
+type KafkaSubscriber struct {
+	cli        sarama.Client
 	handlerMap map[string]Handler
 	done       chan struct{}
 }
 
-func NewKafkaServer(consumer sarama.Consumer) *KafkaServer {
-	return &KafkaServer{
-		consumer:   consumer,
-		done:       make(chan struct{}),
+func NewKafkaSubscriber(cli sarama.Client) Subscriber {
+	return &KafkaSubscriber{
+		cli:        cli,
 		handlerMap: make(map[string]Handler),
+		done:       make(chan struct{}),
 	}
 }
 
-func (k *KafkaServer) AddHandler(event string, handler Handler) {
-	k.handlerMap[event] = handler
-}
-
-func (k *KafkaServer) Start(ctx context.Context) error {
-	for topic, handler := range k.handlerMap {
-		partitionConsumer, err := k.consumer.ConsumePartition(topic, 0, 0)
-		if err != nil {
-			return err
-		}
-		tmpTopic := topic
-		go func(handler Handler) {
-			log.Printf("Started consumer for topic %s", tmpTopic)
-			defer func() {
-				partitionConsumer.AsyncClose()
-			}()
-			for {
-				select {
-				case msg := <-partitionConsumer.Messages():
-					handler.Handle(context.Background(), msg.Value)
-				case <-k.done:
-					return
-				}
-			}
-		}(handler)
-	}
+func (k KafkaSubscriber) Start(ctx context.Context) error {
 	return nil
 }
 
-func (k *KafkaServer) Stop(ctx context.Context) error {
+func (k KafkaSubscriber) Stop(ctx context.Context) error {
 	close(k.done)
-	k.consumer.Close()
+	return k.cli.Close()
+}
+
+func (k KafkaSubscriber) Subscribe(subReq SubRequest, handler Handler) error {
+	consumer, err := sarama.NewConsumerFromClient(k.cli)
+	partitionConsumer, err := consumer.ConsumePartition(subReq.Topic, 0, sarama.OffsetNewest)
+	if err != nil {
+		return err
+	}
+	go func(handler Handler) {
+		log.Printf("Started consumer for topic %s", subReq.Topic)
+		defer func() {
+			partitionConsumer.AsyncClose()
+		}()
+		for {
+			select {
+			case msg := <-partitionConsumer.Messages():
+				handler.Handle(context.Background(), Message{
+					Data:  msg.Value,
+					Topic: msg.Topic,
+				})
+			case <-k.done:
+				return
+			}
+		}
+	}(handler)
 	return nil
 }

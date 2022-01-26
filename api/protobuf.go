@@ -17,9 +17,9 @@ func NewOrderHandler(srv ReceiverServer) events.Handler {
 	}
 }
 
-func (o *OrderHandler) Handle(ctx context.Context, data []byte) {
+func (o *OrderHandler) Handle(ctx context.Context, msg events.Message) {
 	event := &Event{}
-	err := proto.Unmarshal(data, event)
+	err := proto.Unmarshal(msg.Data, event)
 	if err != nil {
 		log.Printf("handle event error: %v", err)
 		return
@@ -27,10 +27,9 @@ func (o *OrderHandler) Handle(ctx context.Context, data []byte) {
 	_, _ = o.srv.ReceiveEvent(ctx, event)
 }
 
-func RegisterHandler(server *events.KafkaServer, topic string, srv ReceiverServer) {
-	server.AddHandler(topic, NewOrderHandler(srv))
-}
-
-func RegisterHandlerTmp(server *events.Subscriber, topic string, srv ReceiverServer) {
-	server.AddHandler(topic, NewOrderHandler(srv))
+func RegisterHandler(server events.Subscriber, subReq events.SubRequest, srv ReceiverServer) {
+	err := server.Subscribe(subReq, NewOrderHandler(srv))
+	if err != nil {
+		log.Fatalf("subscribe error: %v", err)
+	}
 }
