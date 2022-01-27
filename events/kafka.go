@@ -5,6 +5,8 @@ import (
 	"github.com/Shopify/sarama"
 )
 
+// kafka PoC
+
 type KafkaReceiver struct {
 	consumer         sarama.Consumer
 	consumePartition sarama.PartitionConsumer
