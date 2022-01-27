@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+
+package api.channel;
+
+
+option go_package = "./channel;channel";
+
+
+message EnterEvent {
+    string name = 1;
+    uint32 uid = 2;
+}

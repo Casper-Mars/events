@@ -14,8 +14,6 @@ func NewOrderCreateEventSub() api.OrderCreateEventSubscriber {
 }
 
 func (o *orderCreateEventSub) Receive(ctx context.Context, in *api.OrderCreateEvent) error {
-
 	log.Printf("Receive OrderCreateEvent: %v", in)
-
 	return nil
 }

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+
+package api.user;
+
+option go_package = "./user;user";
+
+message LoginEvent {
+    string ip =1;
+}
+
