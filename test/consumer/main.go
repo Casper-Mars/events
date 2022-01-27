@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
-	"events/order"
+	"events/test/order"
 	"log"
 )
 
 func main() {
-	subscriber := NewSubscriber(&order.EventSub1{}, &order.EventSub2{}, &order.BuyEventSub{})
-	subscriber.Start(context.Background())
+	subscriber := NewSubscriber(order.NewOrderCreateEventSub())
+	err := subscriber.Start(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Printf("Kafka server started")
 	select {}
 }

@@ -1,49 +1,54 @@
 package main
 
 import (
-	"events/api"
+	"context"
+	"events/events"
+	"events/test/api"
+	"fmt"
 	"github.com/Shopify/sarama"
-	"github.com/golang/protobuf/proto"
 	"log"
 	"time"
 )
 
+var size = 100
+
 func main() {
-	producer, err := sarama.NewAsyncProducer([]string{"localhost:9093"}, sarama.NewConfig())
+
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+	cli, err := sarama.NewClient([]string{"localhost:9093"}, config)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-	size := 100
-	go func() {
-		for {
-			err = <-producer.Errors()
-			if err != nil {
-				log.Printf("producer error: %v", err)
-			}
+	defer func() {
+		err2 := cli.Close()
+		if err2 != nil {
+			log.Printf("Error closing client: %v", err2)
 		}
 	}()
-	for i := 0; i < size; i++ {
-		event := api.Event{
-			OrderId: int64(i),
-			UserId:  int64(i),
+	sender, err := events.NewKafkaSender(cli)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		err2 := sender.Close()
+		if err2 != nil {
+			log.Printf("Error closing sender: %v", err2)
 		}
-		marshal, err := proto.Marshal(&event)
-		if err != nil {
-			log.Printf("marshal error: %v", err)
-			continue
-		}
-		producer.Input() <- &sarama.ProducerMessage{Topic: "buy", Value: sarama.ByteEncoder(marshal)}
+	}()
+	buyEventPublisher := api.NewOrderCreateEventPublisher(events.PublishMetadata{
+		Topic: "buy",
+	}, sender)
 
-		log.Printf("send msg")
+	for i := 1; i <= size; i++ {
+		err := buyEventPublisher.SendEvent(context.Background(), &api.OrderCreateEvent{
+			Id:   int64(i),
+			Name: fmt.Sprintf("%d", i),
+		})
+		if err != nil {
+			log.Printf("error: %v", err)
+		}
+		log.Println("sent event")
 		time.Sleep(time.Second)
 	}
-	producer.Close()
 }
-
-//func test() {
-//	cg, err := sarama.NewConsumerGroup([]string{"localhost:9093"}, "test_group", sarama.NewConfig())
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//}

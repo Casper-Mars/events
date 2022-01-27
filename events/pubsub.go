@@ -14,6 +14,10 @@ type Message struct {
 	Data  []byte
 }
 
+type PublishMetadata struct {
+	Topic string
+}
+
 type SubRequest struct {
 	Topic string
 }
@@ -21,15 +25,4 @@ type SubRequest struct {
 type Subscriber interface {
 	transport.Server
 	Subscribe(subReq SubRequest, handler Handler) error
-}
-
-type ReceiverBuilder interface {
-	Build(subReq SubRequest) (Receiver, error)
-}
-
-type Receiver interface {
-	Receive(ctx context.Context) (Message, error)
-	Ack(msg Message) error
-	Nack(msg Message) error
-	Close() error
 }
