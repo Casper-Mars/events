@@ -5,7 +5,7 @@ import (
 	"events/events"
 	"events/test/api"
 	"fmt"
-	"github.com/streadway/amqp"
+	"github.com/Shopify/sarama"
 	"log"
 	"time"
 )
@@ -35,20 +35,20 @@ func main() {
 }
 
 func createSender() events.Sender {
-	//config := sarama.NewConfig()
-	//config.Producer.Return.Successes = true
-	//cli, err := sarama.NewClient([]string{"localhost:9093"}, config)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//sender, err := events.NewKafkaSender(cli)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+	cli, err := sarama.NewClient([]string{"localhost:9093"}, config)
 	if err != nil {
 		log.Fatal(err)
 	}
-	sender := events.NewRabbitMQSender(connection)
+	sender, err := events.NewKafkaSender(cli)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//sender := events.NewRabbitMQSender(connection)
 	return sender
 }
