@@ -14,6 +14,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Kafka server started")
+	log.Printf("server started")
 	select {}
 }

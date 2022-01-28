@@ -40,6 +40,15 @@ func (s *Server) Start(ctx context.Context) error {
 				err = handler.Handle(context.Background(), msg)
 				if err != nil {
 					log.Printf("handler error: %v", err)
+					err := receiver.Nack(msg)
+					if err != nil {
+						log.Printf("nack error: %v", err)
+					}
+				} else {
+					err := receiver.Ack(msg)
+					if err != nil {
+						log.Printf("ack error: %v", err)
+					}
 				}
 			}
 		}(receiver, handler)
